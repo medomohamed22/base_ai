@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>سهم | استبيان دقيقة واحدة</title>
+<meta name="description" content="استبيان سريع عن الاستثمار في الأسهم الأمريكية بمبالغ صغيرة من الموبايل.">
+<meta property="og:title" content="سهم | استبيان دقيقة واحدة">
+<meta property="og:description" content="ساعدنا نبني أسهل طريقة عربية للاستثمار في الأسهم الأمريكية من دولار واحد.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: one narrow column, a ticker band on top, questions as quiet numbered cards, sticky submit at the bottom. */
+:root{
+  --bg:#F3F6F5; --surface:#FFFFFF; --ink:#13201D; --muted:#5B6B67; --line:#D9E2DF;
+  --accent:#0E6E62; --accent-ink:#FFFFFF; --accent-soft:#E1F0EC; --gold:#B7791F; --err:#B42318;
+  --display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --body:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0D1513; --surface:#15201D; --ink:#E8F0EE; --muted:#9AAEA9; --line:#26332F;
+  --accent:#3FBFA9; --accent-ink:#06120F; --accent-soft:#16302B; --gold:#E3A94A; --err:#F97066; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.7 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:640px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px));padding-block:0 120px}
+.ticker{overflow:hidden;border-bottom:1px solid var(--line);background:var(--surface);direction:ltr}
+.ticker-track{display:flex;gap:28px;width:max-content;padding:10px 16px;font:500 13px/1 var(--body);color:var(--muted);letter-spacing:.04em;animation:slide 40s linear infinite}
+.ticker-track b{color:var(--ink);font-weight:600}
+@keyframes slide{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.ticker-track{animation:none}}
+header{padding-block:36px 8px}
+.brand{display:flex;align-items:center;gap:10px;font:700 22px/1 var(--display);color:var(--accent)}
+.brand svg{flex:none}
+h1{font:700 clamp(26px,6vw,34px)/1.35 var(--display);margin:18px 0 10px;text-wrap:balance}
+.lede{color:var(--muted);margin:0;max-width:52ch}
+.meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:14px;color:var(--muted)}
+.meta span{display:inline-flex;align-items:center;gap:6px}
+form{display:flex;flex-direction:column;gap:14px;margin-top:26px}
+fieldset{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:18px 18px 16px;margin:0;min-width:0}
+fieldset.key{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+legend{padding:0;font:600 17px/1.5 var(--display);display:flex;gap:10px;align-items:baseline;float:right;width:100%;margin-bottom:12px}
+legend .n{font:600 13px/1 var(--body);color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:5px 9px;flex:none}
+.hint{display:block;clear:both;font-size:13px;color:var(--muted);margin:-6px 0 10px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;clear:both}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.opt span{display:block;border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:15px;line-height:1.4;cursor:pointer;transition:background .15s,border-color .15s}
+.opt input:checked+span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.opt input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+.opt span:hover{border-color:var(--accent)}
+textarea,input[type=text]{width:100%;font:15px/1.6 var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;clear:both;display:block}
+textarea{min-height:84px;resize:vertical}
+textarea:focus,input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px}
+.req{color:var(--err);font-size:13px;font-weight:500}
+.bar{position:fixed;inset:auto 0 0;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px max(16px,env(safe-area-inset-left,0px)) calc(12px + env(safe-area-inset-bottom,0px))}
+.bar-in{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.prog{flex:1;min-width:0}
+.prog-t{font-size:13px;color:var(--muted)}
+.track{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:6px}
+.fill{height:100%;width:0;background:var(--accent);transition:width .25s}
+button{font:600 16px/1 var(--display);background:var(--accent);color:var(--accent-ink);border:0;border-radius:12px;padding:14px 22px;cursor:pointer;flex:none}
+button:disabled{opacity:.55;cursor:default}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.msg{font-size:14px;color:var(--err);min-height:1.2em}
+.done{display:none;text-align:center;padding-block:60px 40px}
+.done h2{font:700 28px/1.3 var(--display);margin:16px 0 8px}
+.done p{color:var(--muted);margin:0 auto;max-width:44ch}
+.share{margin-top:22px;display:inline-flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.share a,.share button{font:500 15px/1 var(--body);border-radius:10px;padding:12px 16px;text-decoration:none}
+.share a{background:var(--accent-soft);color:var(--accent)}
+.share button{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+footer{font-size:12px;color:var(--muted);margin-top:22px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="ticker" aria-hidden="true"><div class="ticker-track" id="tk"></div></div>
+<main class="wrap">
+  <section id="intro">
+  <header>
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="currentColor"/><path d="M7 21l6-6 4 4 8-9" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 10h5v5" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      سهم
+    </div>
+    <h1>تستثمر في أبل وإنفيديا بدولار واحد؟</h1>
+    <p class="lede">بنبني تطبيق عربي بيخلّي أي حد يستثمر في الأسهم الأمريكية بمبالغ صغيرة، من غير وسيط ولا أوراق. رأيك هيحدد شكل التطبيق.</p>
+    <div class="meta"><span>⏱ دقيقة واحدة</span><span>🔒 من غير إيميل ولا تسجيل</span><span>9 أسئلة</span></div>
+  </header>
+  </section>
+
+  <form id="f" novalidate>
+    <fieldset><legend><span class="n">1</span>سنك؟</legend>
+      <div class="opts" data-name="age" data-type="radio">
+        <label class="opt"><input type="radio" name="age" value="under18"><span>أقل من 18</span></label>
+        <label class="opt"><input type="radio" name="age" value="18-24"><span>18–24</span></label>
+        <label class="opt"><input type="radio" name="age" value="25-34"><span>25–34</span></label>
+        <label class="opt"><input type="radio" name="age" value="35-44"><span>35–44</span></label>
+        <label class="opt"><input type="radio" name="age" value="45+"><span>45+</span></label>
+      </div></fieldset>
+
+    <fieldset><legend><span class="n">2</span>بلدك؟</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="country" value="EG"><span>مصر</span></label>
+        <label class="opt"><input type="radio" name="country" value="SA"><span>السعودية</span></label>
+        <label class="opt"><input type="radio" name="country" value="AE"><span>الإمارات</span></label>
+        <label class="opt"><input type="radio" name="country" value="MA"><span>المغرب</span></label>
+        <label class="opt"><input type="radio" name="country" value="other"><span>بلد تاني</span></label>
+      </div></fieldset>
+
+    <fieldset><legend><span class="n">3</span>عمرك استثمرت في أسهم أمريكية (زي أبل أو إنفيديا)؟</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="invested" value="now"><span>أيوه حاليًا</span></label>
+        <label class="opt"><input type="radio" name="invested" value="before"><span>جربت قبل كده</span></label>
+        <label class="opt"><input type="radio" name="invested" value="want"><span>لأ بس نفسي</span></label>
+        <label class="opt"><input type="radio" name="invested" value="not_interested"><span>لأ ومش مهتم</span></label>
+      </div></fieldset>
+
+    <fieldset><legend><span class="n">4</span>إيه اللي مانعك أو مصعّبها عليك؟</legend>
+      <span class="hint">اختار كل اللي ينطبق</span>
+      <div class="opts">
+        <label class="opt"><input type="checkbox" name="blockers" value="broker"><span>مش عارف أفتح حساب عند وسيط</span></label>
+        <label class="opt"><input type="checkbox" name="blockers" value="minimum"><span>الحد الأدنى للإيداع كبير</span></label>
+        <label class="opt"><input type="checkbox" name="blockers" value="fees"><span>الرسوم عالية</span></label>
+        <label class="opt"><input type="checkbox" name="blockers" value="knowledge"><span>مش فاهم أبدأ منين</span></label>
+        <label class="opt"><input type="checkbox" name="blockers" value="fear"><span>خايف أخسر</span></label>
+        <label class="opt"><input type="checkbox" name="blockers" value="transfer"><span>مشكلة تحويل الفلوس</span></label>
+        <label class="opt"><input type="checkbox" name="blockers" value="other"><span>سبب تاني</span></label>
+      </div></fieldset>
+
+    <fieldset><legend><span class="n">5</span>عندك USDC أو أي عملة رقمية؟</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="crypto" value="yes"><span>أيوه</span></label>
+        <label class="opt"><input type="radio" name="crypto" value="can_buy"><span>لأ، بس أعرف أشتري</span></label>
+        <label class="opt"><input type="radio" name="crypto" value="no"><span>لأ ومعرفش</span></label>
+      </div></fieldset>
+
+    <fieldset class="key"><legend><span class="n">6</span><span>لو فيه تطبيق تكلّمه بالعربي وتقوله «استثمر 5 دولار كل يوم في أبل»، يعمل كده لوحده بحدود إنت اللي بتحددها وتوقفه في أي لحظة، هتجربه؟ <span class="req">(مطلوب)</span></span></legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="would_try" value="certain" required><span>أكيد</span></label>
+        <label class="opt"><input type="radio" name="would_try" value="likely"><span>غالبًا</span></label>
+        <label class="opt"><input type="radio" name="would_try" value="unsure"><span>مش متأكد</span></label>
+        <label class="opt"><input type="radio" name="would_try" value="no"><span>لأ</span></label>
+      </div></fieldset>
+
+    <fieldset><legend><span class="n">7</span>أقصى مبلغ ترتاح تبدأ بيه؟</legend>
+      <div class="opts" style="direction:ltr;justify-content:flex-end">
+        <label class="opt"><input type="radio" name="start_amount" value="1-5"><span>$1–5</span></label>
+        <label class="opt"><input type="radio" name="start_amount" value="5-20"><span>$5–20</span></label>
+        <label class="opt"><input type="radio" name="start_amount" value="20-100"><span>$20–100</span></label>
+        <label class="opt"><input type="radio" name="start_amount" value="100+"><span>+$100</span></label>
+      </div></fieldset>
+
+    <fieldset><legend><span class="n">8</span>إيه أهم حاجة لازم تكون موجودة علشان تثق في تطبيق زي ده؟</legend>
+      <textarea id="trust_need" name="trust_need" maxlength="500" placeholder="مثلًا: أقدر أسحب فلوسي في أي وقت…"></textarea>
+    </fieldset>
+
+    <fieldset><legend><span class="n">9</span>عايز تبقى من أول 50 واحد يجربوه مجانًا؟</legend>
+      <span class="hint">سيب يوزر X أو تيليجرام (اختياري)</span>
+      <input type="text" id="beta_handle" name="beta_handle" maxlength="80" dir="ltr" placeholder="@username">
+    </fieldset>
+
+    <footer>الإجابات بتتحفظ من غير اسم ولا إيميل، وبتستخدم بس علشان نبني التطبيق. "سهم" مشروع مشارك في مسابقة Stocks Maxxing على شبكة Base. ده مش نصيحة استثمارية.</footer>
+  </form>
+
+  <section class="done" id="done" aria-live="polite">
+    <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="var(--accent-soft)"/><path d="M20 33l8 8 16-17" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h2>شكرًا! إجابتك وصلت 🙏</h2>
+    <p id="doneTxt">رأيك هيفرق فعلًا. لو سبت اليوزر بتاعك، هنكلمك أول ما التجربة تبدأ.</p>
+    <div class="share">
+      <a id="wa" href="#" target="_blank" rel="noopener">ابعته لصاحبك على واتساب</a>
+      <button type="button" id="copy">انسخ الرابط</button>
+    </div>
+  </section>
+</main>
+
+<div class="bar" id="bar"><div class="bar-in">
+  <div class="prog"><div class="prog-t" id="pt">0 من 9</div><div class="track"><div class="fill" id="pf"></div></div><div class="msg" id="msg" role="alert"></div></div>
+  <button type="submit" form="f" id="send">إرسال</button>
+</div></div>
+
+<script>
+const SUPABASE_URL="https://cguxdschojoqbffdrlhm.supabase.co";
+const SUPABASE_KEY="sb_publishable_6xtVxiosxF2T6qlB68eCGg_wiNdkdX_"; // publishable key: insert-only by RLS
+const syms=["AAPL","NVDA","GOOGL","META","MSFT","AMD","PLTR","ORCL","AMZN","TSLA","SNDK","SPCX"];
+document.getElementById("tk").innerHTML=[...syms,...syms].map(s=>`<span><b>${s}</b> · on Base</span>`).join("");
+const f=document.getElementById("f"),send=document.getElementById("send"),msg=document.getElementById("msg");
+const names=["age","country","invested","blockers","crypto","would_try","start_amount","trust_need","beta_handle"];
+function answered(n){const els=f.elements[n]; if(!els) return false;
+  if(els.value!==undefined && !(els instanceof RadioNodeList)) return els.value.trim()!=="";
+  return [...els].some(e=>e.checked);}
+function progress(){const c=names.filter(answered).length;
+  document.getElementById("pt").textContent=c+" من 9";
+  document.getElementById("pf").style.width=(c/9*100)+"%";}
+f.addEventListener("input",()=>{progress(); msg.textContent="";});
+f.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const v=n=>{const el=f.elements[n]; return el? (el.value||"").trim()||null : null;};
+  const body={age:v("age"),country:v("country"),invested:v("invested"),
+    blockers:[...f.querySelectorAll('input[name=blockers]:checked')].map(i=>i.value),
+    crypto:v("crypto"),would_try:v("would_try"),start_amount:v("start_amount"),
+    trust_need:v("trust_need"),beta_handle:v("beta_handle"),lang:"ar"};
+  if(!body.would_try){msg.textContent="جاوب على سؤال 6 الأول، ده أهم سؤال 🙏";
+    document.querySelector("fieldset.key").scrollIntoView({behavior:"smooth",block:"center"}); return;}
+  send.disabled=true; send.textContent="بيتبعت…";
+  try{
+    const r=await fetch(SUPABASE_URL+"/rest/v1/sahm_survey",{method:"POST",
+      headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},
+      body:JSON.stringify(body)});
+    if(!r.ok) throw new Error(r.status);
+    try{localStorage.setItem("sahm_survey_done","1")}catch(_){}
+    f.style.display="none"; document.getElementById("intro").style.display="none";
+    document.getElementById("bar").style.display="none";
+    const d=document.getElementById("done"); d.style.display="block"; window.scrollTo(0,0);
+  }catch(err){
+    msg.textContent="الإرسال ما نجحش. اتأكد من النت وجرب تاني.";
+    send.disabled=false; send.textContent="إرسال";
+  }
+});
+const shareTxt="بيعملوا تطبيق عربي للاستثمار في الأسهم الأمريكية من دولار واحد، وعايزين رأيك في دقيقة: "+location.href;
+document.getElementById("wa").href="https://wa.me/?text="+encodeURIComponent(shareTxt);
+document.getElementById("copy").addEventListener("click",async ev=>{
+  try{await navigator.clipboard.writeText(location.href); ev.target.textContent="اتنسخ ✓";}
+  catch(_){ev.target.textContent=location.href;}
+});
+progress();
+</script>
+</body>
+</html>
