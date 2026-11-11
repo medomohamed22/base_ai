@@ -1,0 +1,13 @@
+# secrets — never commit
+.env
+.env.*
+!.env.example
+*.key
+keystore/
+
+# build
+node_modules/
+out/
+cache/
+broadcast/
+.next/
