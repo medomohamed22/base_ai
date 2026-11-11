@@ -5,7 +5,7 @@ const top=m.rows.filter(x=>x.liq>2e5||x.vol>1e6).slice(0,12);
 const pools=new Set(m.rows.flatMap(x=>x.pools.map(p=>p.pair.toLowerCase())));
 let id=0; async function rpc(method,params){ for(let k=0;k<5;k++){ try{ const r=await fetch(RPC,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:++id,method,params})}).then(r=>r.json()); if(r.error) throw new Error(JSON.stringify(r.error)); return r.result;}catch(e){ if(k==4) throw e; await new Promise(s=>setTimeout(s,800*(k+1)));} } }
 const head=parseInt(await rpc("eth_blockNumber",[]),16);
-const SPAN=+process.env.SPAN||43200, STEP=+process.env.STEP||5000;
+const SPAN=+process.env.SPAN||432000, STEP=+process.env.STEP||20000; // Base = 0.2s blocks -> 432000 = 24h
 const T="0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 const stats={}; const flows={}; let nlogs=0;
 for(const tok of top){
