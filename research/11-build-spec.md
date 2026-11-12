@@ -168,7 +168,7 @@ event Executed(address indexed user, address indexed stock, uint256 usdcIn, uint
 ---
 
 ## 7. هيكل الـ repo
-**القرار (12 نوفمبر):** كل حاجة في نفس الـ repo `base_ai`. ⚠️ لو هيتعمل public، ملفات البحث (ومنها `05-partners.md` و`02-application-form.md`) هتبقى ظاهرة هي والـ git history بتاعها.
+**القرار (12 نوفمبر):** كل حاجة في نفس الـ repo `base_ai`، و**هيتعمل public بكل الملفات** (البحث كمان جزء من الـ build in public). ممكن نغيّر اسمه لـ `sahm` قبل التسليم. اتعمل فحص لكل تاريخ الـ git قبل النشر: مفيش مفاتيح ولا أسرار ولا إيميلات. الحاجة الوحيدة العلنية هي مفتاح Supabase **publishable** في الاستبيان، وده معمول علشان يبقى علني.
 ```
 base_ai/
 ├── research/           البحث والخطط (موجود)
