@@ -11,3 +11,11 @@ node bot-strategies.mjs 0xADDR [0xADDR...]  # per-wallet strategy: price vs Hype
 
 Env: `RPC` (default publicnode), `SPAN` blocks (default 432000 = 24h; Base blocks are 0.2s), `STEP` (default 5000).
 Results from 2026-11-11 are summarised in `research/09-market-competitors-plan.md` and `research/10-trading-bots.md`.
+
+## Halal screen (AAOIFI ratios from SEC XBRL)
+
+```bash
+cp ciks.json <workdir>/ && cd <workdir>
+SEC_UA="Your Name you@example.com" node halal-screen.mjs   # writes halal.json
+```
+Result from 2026-11-12: `data/halal-ratios-2026-11-12.json`, verdicts in `research/11-build-spec.md`.
