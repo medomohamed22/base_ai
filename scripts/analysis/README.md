@@ -18,4 +18,4 @@ Results from 2026-11-11 are summarised in `research/09-market-competitors-plan.m
 cp ciks.json <workdir>/ && cd <workdir>
 SEC_UA="Your Name you@example.com" node halal-screen.mjs   # writes halal.json
 ```
-Result from 2026-11-12: `data/halal-ratios-2026-11-12.json`, verdicts in `research/11-build-spec.md`.
+Result from 2026-11-12: `data/halal/ratios-2026-11-12.json`, verdicts in `research/11-build-spec.md`.

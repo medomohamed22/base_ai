@@ -15,7 +15,7 @@
 | إيراد الفوائد ÷ الإيرادات | < 5% | آخر 10-K. **ده مؤشر تقريبي** لنسبة الدخل غير المباح |
 | نشاط الشركة | مش (بنوك ربوية، وخمور، وقمار، وترفيه محرّم، ...) | مراجعة يدوية |
 
-القيمة السوقية = عدد الأسهم × سعر Hyperliquid يوم 12/11. البيانات في `data/halal-ratios-2026-11-12.json`، والسكريبت `scripts/analysis/halal-screen.mjs`.
+القيمة السوقية = عدد الأسهم × سعر Hyperliquid يوم 12/11. البيانات في `data/halal/ratios-2026-11-12.json`، والسكريبت `scripts/analysis/halal-screen.mjs`.
 
 | السهم | الديون % | النقد % | فوائد/إيراد % | النشاط | الحكم المبدئي |
 |---|---|---|---|---|---|
@@ -168,9 +168,12 @@ event Executed(address indexed user, address indexed stock, uint256 usdcIn, uint
 ---
 
 ## 7. هيكل الـ repo
-**توصية:** نعمل **repo جديد public اسمه `sahm`** للمنتج، ونسيب `base_ai` **private** للبحث. فيه ملفات زي `05-partners.md` (نقاشات الشركاء والتوكن) و`02-application-form.md` مش لازم تبقى علنية، والـ git history بيحتفظ بيها حتى لو اتمسحت.
+**القرار (12 نوفمبر):** كل حاجة في نفس الـ repo `base_ai`. ⚠️ لو هيتعمل public، ملفات البحث (ومنها `05-partners.md` و`02-application-form.md`) هتبقى ظاهرة هي والـ git history بتاعها.
 ```
-sahm/
+base_ai/
+├── research/           البحث والخطط (موجود)
+├── scripts/            التحليل واختبار الـ fork (موجود)
+├── survey/             الاستبيان (موجود)
 ├── contracts/          Foundry: src/SahmExecutor.sol، test/، script/
 ├── agent/              Node + viem: guard.ts، executor.ts، plans.ts، llama.ts
 ├── web/                Next.js + OnchainKit (RTL)
@@ -184,7 +187,7 @@ sahm/
 ## 8. خطة 13 نوفمبر (يوم البناء الأول)
 | الوقت | المهمة | علامة النجاح |
 |---|---|---|
-| الصبح | إنشاء repo `sahm` + Foundry + Next.js skeleton | `forge build` و`next build` ينجحوا |
+| الصبح | Foundry في `contracts/` + Next.js في `web/` | `forge build` و`next build` ينجحوا |
 | الضهر | `SahmExecutor` + اختبارات الـ fork | 9 اختبارات ✅ |
 | العصر | Deploy على Sepolia (بـ mock stock) | عنوان العقد على sepolia.basescan |
 | بالليل | بوست اليوم 0 (عربي + إنجليزي) | منشور ✅ |

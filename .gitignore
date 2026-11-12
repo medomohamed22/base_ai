@@ -11,3 +11,7 @@ out/
 cache/
 broadcast/
 .next/
+*.pem
+contracts/out/
+.vercel
+.DS_Store
