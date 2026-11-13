@@ -28,7 +28,7 @@ export default async function Start() {
 
       <div className="grid-3 mt40">
         {sources.map(([name, steps], i) => (
-          <Reveal key={name} className="card" delay={i * 80}>
+          <Reveal key={name} className="card" delay={i * 40}>
             <h3>{name}</h3>
             <ol className="muted small mt16" style={{ paddingInlineStart: 18, margin: "16px 0 0", lineHeight: 1.9 }}>
               {steps.map((s) => (
@@ -39,7 +39,7 @@ export default async function Start() {
         ))}
       </div>
 
-      <Reveal className="card mt24" delay={100}>
+      <Reveal className="card mt24" delay={50}>
         <h2 className="h2" style={{ fontSize: 26 }}>{t.start.yourAddr}</h2>
         <div className="mt16">
           <WalletFunding />

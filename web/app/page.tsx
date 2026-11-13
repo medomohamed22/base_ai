@@ -52,12 +52,12 @@ export default async function Home() {
             <h3>{t.home.f1t}</h3>
             <p className="muted">{t.home.f1d}</p>
           </Reveal>
-          <Reveal className="card tile" delay={80}>
+          <Reveal className="card tile" delay={40}>
             <Icon d="M12 3v18M5 8l7-5 7 5M5 8l-2 6h4zM19 8l-2 6h4z" />
             <h3>{t.home.f2t}</h3>
             <p className="muted">{t.home.f2d}</p>
           </Reveal>
-          <Reveal className="card tile" delay={160}>
+          <Reveal className="card tile" delay={80}>
             <Icon d="M20 6 9 17l-5-5" />
             <h3>{t.home.f3t}</h3>
             <p className="muted">{t.home.f3d}</p>
@@ -71,7 +71,7 @@ export default async function Home() {
         </Reveal>
         <ol className="steps">
           {t.home.how.map(([h, p], i) => (
-            <Reveal as="li" key={h} delay={i * 90}>
+            <Reveal as="li" key={h} delay={i * 40}>
               <h3>{h}</h3>
               <p>{p}</p>
             </Reveal>

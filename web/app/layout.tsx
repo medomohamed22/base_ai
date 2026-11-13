@@ -11,7 +11,7 @@ import "./globals.css";
 
 const plex = IBM_Plex_Sans_Arabic({
   subsets: ["arabic", "latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600", "700"],
   display: "swap",
   variable: "--f-ar",
 });
