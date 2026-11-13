@@ -38,7 +38,7 @@ contract SahmExecutorSepoliaTest is Test {
     function setUp() public {
         vm.createSelectFork(vm.envOr("BASE_SEPOLIA_RPC_URL", string("https://sepolia.base.org")));
         agent = makeAddr("agent");
-        router = new MockRouter(USDC, 180e6, "Mock NVIDIA (testnet)", "tNVDA");
+        router = new MockRouter(USDC, address(this), 180e6, "Mock NVIDIA (testnet)", "tNVDA");
         ex = new SahmExecutor(SPM, USDC, address(this), agent);
         ex.setStock(address(router.stock()), true);
         ex.setRouter(address(router), true);

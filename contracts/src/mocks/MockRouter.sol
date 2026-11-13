@@ -16,9 +16,10 @@ contract MockRouter {
     /// USDC (6 decimals) per 1 whole share.
     uint256 public priceUsdc;
 
-    constructor(address usdc_, uint256 priceUsdc_, string memory name_, string memory symbol_) {
+    /// @dev `owner_` is explicit so the router can be deployed through a CREATE2 factory.
+    constructor(address usdc_, address owner_, uint256 priceUsdc_, string memory name_, string memory symbol_) {
         usdc = usdc_;
-        owner = msg.sender;
+        owner = owner_;
         priceUsdc = priceUsdc_;
         stock = new MockStock(name_, symbol_, address(this));
     }

@@ -18,7 +18,7 @@ contract DeploySepolia is Script {
         address agent = vm.envAddress("AGENT_ADDRESS");
 
         vm.startBroadcast();
-        router = new MockRouter(USDC_SEPOLIA, 180e6, "Mock NVIDIA (testnet)", "tNVDA");
+        router = new MockRouter(USDC_SEPOLIA, msg.sender, 180e6, "Mock NVIDIA (testnet)", "tNVDA");
         ex = new SahmExecutor(SPM, USDC_SEPOLIA, msg.sender, agent);
         ex.setStock(address(router.stock()), true);
         ex.setRouter(address(router), true);
