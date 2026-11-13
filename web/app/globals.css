@@ -110,3 +110,6 @@ th, td { text-align: start; padding: 8px; border-bottom: 1px solid var(--line); 
 .table-wrap { overflow-x: auto; }
 
 .foot { border-top: 1px solid var(--line); padding-top: 16px; padding-bottom: 32px; color: var(--muted); font-size: 13px; }
+
+.field input { width: 100%; min-width: 0; }
+.break { word-break: break-all; overflow-wrap: anywhere; }
