@@ -8,7 +8,10 @@ One contract. Pulls USDC with the user's Spend Permission, swaps on an allow-lis
 |---|---|
 | `src/SahmExecutor.sol` | `execute(...)`: onlyAgent, whenNotPaused, nonReentrant |
 | `test/SahmExecutor.fork.t.sol` | 13 fork tests on Base mainnet: real USDC, SpendPermissionManager, Coinbase Smart Wallet, NVDAc and its Aerodrome pool |
-| `script/Deploy.s.sol` | Deploy + allow-list stocks and routers |
+| `test/SahmExecutor.sepolia.t.sol` | End-to-end buy on a Base Sepolia fork with the mock stock |
+| `script/Deploy.s.sol` | Mainnet deploy + allow-list stocks and routers |
+| `script/DeploySepolia.s.sol` | Sepolia: mock NVDA (`tNVDA`, $180) + mock router + SahmExecutor |
+| `src/mocks/` | Testnet-only mock stock and router |
 
 ## Run
 Needs Foundry ≥ 1.8.4 (`hardfork = "base:Cobalt"` is set in `foundry.toml`).
@@ -22,7 +25,6 @@ BASE_RPC_URL=https://mainnet.base.org forge test -vv   # or an Alchemy URL
 Keys stay in Foundry's encrypted keystore, never in files:
 ```sh
 cast wallet import sahm-deployer --interactive
-AGENT_ADDRESS=0x... USDC_ADDRESS=0x036CbD53842c5426634e7929541eC2318f3dCF7e \
-BASE_SEPOLIA_RPC_URL=https://sepolia.base.org \
-forge script script/Deploy.s.sol --rpc-url base_sepolia --account sahm-deployer --broadcast
+AGENT_ADDRESS=0x... forge script script/DeploySepolia.s.sol \
+  --rpc-url https://sepolia.base.org --account sahm-deployer --broadcast
 ```
