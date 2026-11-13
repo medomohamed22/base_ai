@@ -38,7 +38,7 @@ export default async function Stats() {
       </div>
       <div className="grid-4 mt40">
         {cards.map(([label, v], i) => (
-          <Reveal key={label} className="card tile" delay={i * 70}>
+          <Reveal key={label} className="card tile" delay={i * 35}>
             <div className="small muted">{label}</div>
             <div className="stat-v num">{v}</div>
           </Reveal>

@@ -57,7 +57,7 @@ export default function StocksGrid({ initial }: { initial: Quotes }) {
         {list.map((s, i) => {
           const quote = q[s.ticker];
           return (
-            <article key={s.ticker} className="card card-hover stock" style={{ animation: `rise .6s var(--ease) ${Math.min(i, 12) * 30}ms both` }}>
+            <article key={s.ticker} className="card card-hover stock" style={{ animation: `rise .35s ease-out ${Math.min(i, 8) * 20}ms both` }}>
               <div className="stock-top">
                 <div>
                   <div className="tk">{s.ticker}</div>
