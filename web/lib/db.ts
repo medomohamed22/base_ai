@@ -1,30 +1,25 @@
 import "server-only";
 
 /**
- * Minimal Supabase PostgREST client (server only). Uses the service-role / secret key, so it must never be
- * imported from client components. Configure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel.
+ * Supabase access (server only). Every call goes through public.sahm_api(), which checks SAHM_DB_SECRET inside the
+ * database. The REST key is the public publishable key, so no service-role key is needed anywhere.
  */
 const URL_ = process.env.SUPABASE_URL || "https://cguxdschojoqbffdrlhm.supabase.co";
-const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || "";
+const KEY = process.env.SUPABASE_PUBLISHABLE_KEY || "sb_publishable_6xtVxiosxF2T6qlB68eCGg_wiNdkdX_";
+const SECRET = process.env.SAHM_DB_SECRET || "";
 
-export const dbEnabled = () => !!KEY;
+export const dbEnabled = () => SECRET.length >= 32;
 
-async function req<T>(path: string, init: RequestInit & { prefer?: string } = {}): Promise<T> {
-  if (!KEY) throw new Error("db_not_configured");
-  const r = await fetch(`${URL_}/rest/v1/${path}`, {
-    ...init,
+async function api<T>(op: string, args: Record<string, unknown> = {}): Promise<T> {
+  if (!dbEnabled()) throw new Error("db_not_configured");
+  const r = await fetch(`${URL_}/rest/v1/rpc/sahm_api`, {
+    method: "POST",
     cache: "no-store",
-    headers: {
-      apikey: KEY,
-      authorization: `Bearer ${KEY}`,
-      "content-type": "application/json",
-      ...(init.prefer ? { prefer: init.prefer } : {}),
-      ...(init.headers || {}),
-    },
+    headers: { apikey: KEY, authorization: `Bearer ${KEY}`, "content-type": "application/json" },
+    body: JSON.stringify({ p_secret: SECRET, p_op: op, p_args: args }),
   });
-  if (!r.ok) throw new Error(`db ${r.status}: ${(await r.text()).slice(0, 300)}`);
-  const text = await r.text();
-  return (text ? JSON.parse(text) : null) as T;
+  if (!r.ok) throw new Error(`db ${op} ${r.status}: ${(await r.text()).slice(0, 300)}`);
+  return (await r.json()) as T;
 }
 
 export type PlanRow = {
@@ -77,57 +72,26 @@ export type ExecutionRow = {
 };
 
 export const db = {
-  upsertUser: (wallet: string, lang: string) =>
-    req("sahm_users?on_conflict=wallet", {
-      method: "POST",
-      prefer: "resolution=ignore-duplicates,return=minimal",
-      body: JSON.stringify({ wallet, lang }),
-    }),
+  upsertUser: (wallet: string, lang: string) => api("upsert_user", { wallet, lang }),
 
   insertPlan: (row: Omit<PlanRow, "id" | "status" | "next_run" | "attempts" | "runs" | "created_at">) =>
-    req<PlanRow[]>("sahm_plans?on_conflict=permission_hash", {
-      method: "POST",
-      prefer: "resolution=merge-duplicates,return=representation",
-      body: JSON.stringify(row),
-    }).then((r) => r[0]),
+    api<PlanRow>("insert_plan", row),
 
-  plansFor: (wallet: string, chainId: number) =>
-    req<PlanRow[]>(
-      `sahm_plans?wallet=eq.${wallet}&chain_id=eq.${chainId}&order=created_at.desc&select=id,target,amount_usd,frequency,dip_boost,daily_cap_usd,status,next_run,runs,created_at,permission_hash`,
-    ),
+  plansFor: (wallet: string, chainId: number) => api<PlanRow[]>("plans_for", { wallet, chain_id: chainId }),
 
-  plansFull: (wallet: string, chainId: number) => req<PlanRow[]>(`sahm_plans?wallet=eq.${wallet}&chain_id=eq.${chainId}`),
+  plansFull: (wallet: string, chainId: number) => api<PlanRow[]>("plans_full", { wallet, chain_id: chainId }),
 
-  updatePlan: (id: string, patch: Partial<PlanRow>) =>
-    req(`sahm_plans?id=eq.${id}`, { method: "PATCH", prefer: "return=minimal", body: JSON.stringify(patch) }),
+  updatePlan: (id: string, patch: Partial<PlanRow>) => api("update_plan", { id, patch }),
 
-  stopPlans: (wallet: string, chainId: number) =>
-    req(`sahm_plans?wallet=eq.${wallet}&chain_id=eq.${chainId}&status=eq.active`, {
-      method: "PATCH",
-      prefer: "return=minimal",
-      body: JSON.stringify({ status: "stopped" }),
-    }),
+  claimDue: (chainId: number, planId?: string) => api<PlanRow[]>("claim_due", { chain_id: chainId, plan_id: planId ?? null }),
 
-  claimDue: (chainId: number, planId?: string) =>
-    req<PlanRow[]>("rpc/sahm_claim_due", {
-      method: "POST",
-      body: JSON.stringify({ p_chain: chainId, p_limit: 25, p_plan: planId ?? null }),
-    }),
-
-  logExecution: (row: ExecutionRow) =>
-    req("sahm_executions", { method: "POST", prefer: "return=minimal", body: JSON.stringify(row) }),
+  logExecution: (row: ExecutionRow) => api("log_execution", row),
 
   executionsFor: (wallet: string, chainId: number, limit = 30) =>
-    req<ExecutionRow[]>(`sahm_executions?wallet=eq.${wallet}&chain_id=eq.${chainId}&order=created_at.desc&limit=${limit}`),
+    api<ExecutionRow[]>("executions_for", { wallet, chain_id: chainId, limit }),
 
-  recent: (chainId: number, limit = 20) =>
-    req<ExecutionRow[]>(
-      `sahm_executions?chain_id=eq.${chainId}&decision=eq.executed&order=created_at.desc&limit=${limit}&select=wallet,ticker,usdc_in,stock_out,tx_hash,created_at`,
-    ),
+  recent: (chainId: number, limit = 20) => api<ExecutionRow[]>("recent", { chain_id: chainId, limit }),
 
   stats: (chainId: number) =>
-    req<{ wallets: number; active_plans: number; buys: number; volume: number }>("rpc/sahm_stats", {
-      method: "POST",
-      body: JSON.stringify({ p_chain: chainId }),
-    }),
+    api<{ wallets: number; active_plans: number; buys: number; volume: number }>("stats", { chain_id: chainId }),
 };
