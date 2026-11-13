@@ -11,8 +11,20 @@ export const USDC: Record<number, Address> = {
 
 export const SPEND_PERMISSION_MANAGER: Address = "0xf85210B21cC50302F477BA56686d2019dC9b67Ad";
 
+/** Known SahmExecutor deployments (public addresses). An env var overrides. */
+const DEPLOYED: Record<number, Address | ""> = {
+  [baseSepolia.id]: "0xd2839a6ae65636B964CB54D4D3a6A2A55954D2dE",
+  [base.id]: "",
+};
+
 /** SahmExecutor address on CHAIN. Empty until deployed. */
-export const EXECUTOR = (process.env.NEXT_PUBLIC_EXECUTOR_ADDRESS || "") as Address | "";
+export const EXECUTOR = (process.env.NEXT_PUBLIC_EXECUTOR_ADDRESS || DEPLOYED[CHAIN.id]) as Address | "";
+
+/** Testnet-only mock stock + router (see contracts/deployments/base-sepolia.json). */
+export const SEPOLIA_MOCK = {
+  router: "0xDc8F2cbc1372cF1d5EC3bf860C03Ec42aCb8DD9c" as Address,
+  stock: "0xfA70505E85dF2619404847f6C844066Fd2C8Cce9" as Address,
+};
 
 /** Public Builder Code (ERC-8021), attached to every transaction. */
 export const BUILDER_CODE = "bc_cs3y0r48";

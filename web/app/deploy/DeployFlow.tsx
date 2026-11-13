@@ -177,7 +177,7 @@ export default function DeployFlow() {
 
   if (!isConnected || !address) {
     return (
-      <div className="card section">
+      <div className="card mt24">
         <p className="muted">افتح الصفحة دي من المتصفح اللي جوه محفظتك، وبعدين دوس اتصال.</p>
         <div className="row">
           {injectedConnector && (
@@ -204,10 +204,10 @@ export default function DeployFlow() {
   const started = status?.router || status?.executor;
 
   return (
-    <div className="card section">
+    <div className="card mt24">
       <div className="row" style={{ justifyContent: "space-between" }}>
         <p className="small muted">المحفظة المتصلة (هتبقى الـ owner):</p>
-        <button className="choice" onClick={() => disconnect()}>تغيير</button>
+        <button className="pill" onClick={() => disconnect()}>تغيير</button>
       </div>
       <p className="num small break">{address}</p>
 
@@ -218,14 +218,14 @@ export default function DeployFlow() {
       </div>
 
       {!finished && (
-        <button className="btn" style={{ width: "100%" }} disabled={busy || !p} onClick={run}>
+        <button className="btn" disabled={busy || !p} onClick={run} style={{ width: "100%" }}>
           {busy ? "شغالين…" : started ? "كمّل النشر" : "انشر على Base Sepolia"}
         </button>
       )}
       <p className="small muted" style={{ marginTop: 8 }}>
         هتوافق على 4 معاملات في المحفظة. التكلفة أقل من 0.0001 ETH تجريبي.
       </p>
-      {step && <p className="note small">{step}</p>}
+      {step && <p className="note mt16">{step}</p>}
       {err && <p className="small break" style={{ color: "var(--no)" }}>{err}</p>}
 
       {p && status && (

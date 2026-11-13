@@ -1,17 +1,24 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getDict } from "@/lib/lang.server";
 import PlanForm from "./PlanForm";
 
-export const metadata: Metadata = { title: "خطتي | سهم" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getDict();
+  return { title: t.plan.title };
+}
 
-export default function Plan() {
+export default async function Plan() {
+  const { t } = await getDict();
   return (
-    <>
-      <h1>اعمل خطتك</h1>
-      <p className="muted">سهم مش بيتنبأ بالسوق. بيشتريلك بانتظام وبالسعر العادل.</p>
+    <div className="wrap narrow page">
+      <div className="hero-in">
+        <h1 className="h1">{t.plan.title}</h1>
+        <p className="lead mt16">{t.plan.sub}</p>
+      </div>
       <Suspense>
         <PlanForm />
       </Suspense>
-    </>
+    </div>
   );
 }

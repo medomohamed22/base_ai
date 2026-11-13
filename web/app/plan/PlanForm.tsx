@@ -2,85 +2,93 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { HALAL_BASKET, STOCKS } from "@/lib/stocks";
 import SignPermission from "@/components/SignPermission";
+import { useT } from "@/components/LangProvider";
+import { HALAL_BASKET, STOCKS } from "@/lib/stocks";
+import { CHAIN } from "@/lib/chain";
 
 const AMOUNTS = [1, 5, 10, 20];
-const FREQ = [
-  { id: "daily", label: "يومي", perMonth: 30 },
-  { id: "weekly", label: "أسبوعي", perMonth: 4 },
-] as const;
+const PER_MONTH = { daily: 30, weekly: 4 } as const;
 
 export default function PlanForm() {
+  const { t, lang } = useT();
   const params = useSearchParams();
   const initial = params.get("stock");
   const options = STOCKS.filter((s) => s.verdict === "ok");
-  const [target, setTarget] = useState<string>(
-    initial && options.some((s) => s.ticker === initial) ? initial : "HALAL",
-  );
+  const [target, setTarget] = useState<string>(initial && options.some((s) => s.ticker === initial) ? initial : "HALAL");
   const [amount, setAmount] = useState(5);
-  const [freq, setFreq] = useState<(typeof FREQ)[number]["id"]>("weekly");
+  const [freq, setFreq] = useState<"daily" | "weekly">("weekly");
   const [dip, setDip] = useState(false);
+  const [eligible, setEligible] = useState(false);
 
-  // On-chain daily cap: the plan amount, or ×1.5 when the dip boost is on.
   const dailyCap = dip ? amount * 1.5 : amount;
-  const f = FREQ.find((x) => x.id === freq)!;
-  const monthly = amount * f.perMonth;
-  const label = target === "HALAL" ? "السلة الحلال" : target;
+  const name = (tk: string) => {
+    const s = STOCKS.find((x) => x.ticker === tk);
+    return s ? (lang === "ar" ? s.nameAr : s.nameEn) : tk;
+  };
+  const what = target === "HALAL" ? t.plan.basket : name(target);
 
   return (
-    <div className="card section" style={{ maxWidth: 560 }}>
+    <div className="card mt40" style={{ padding: "clamp(20px, 4vw, 36px)" }}>
       <div className="field">
-        <label htmlFor="target">تشتري إيه؟</label>
+        <label htmlFor="target">{t.plan.what}</label>
         <select id="target" value={target} onChange={(e) => setTarget(e.target.value)}>
-          <option value="HALAL">السلة الحلال ({HALAL_BASKET.join(" · ")})</option>
+          <option value="HALAL">
+            {t.plan.basket} · {HALAL_BASKET.join(" · ")}
+          </option>
           {options.map((s) => (
             <option key={s.ticker} value={s.ticker}>
-              {s.nameAr} ({s.ticker})
+              {name(s.ticker)} · {s.ticker}
             </option>
           ))}
         </select>
       </div>
 
       <div className="field">
-        <span>المبلغ كل مرة</span>
+        <span className="label">{t.plan.amount}</span>
         <div className="choices">
           {AMOUNTS.map((a) => (
-            <button key={a} type="button" className="choice" aria-pressed={amount === a} onClick={() => setAmount(a)}>
-              <span className="num">${a}</span>
+            <button key={a} type="button" className="choice num" aria-pressed={amount === a} onClick={() => setAmount(a)}>
+              ${a}
             </button>
           ))}
         </div>
       </div>
 
       <div className="field">
-        <span>كل قد إيه؟</span>
+        <span className="label">{t.plan.freq}</span>
         <div className="choices">
-          {FREQ.map((x) => (
-            <button key={x.id} type="button" className="choice" aria-pressed={freq === x.id} onClick={() => setFreq(x.id)}>
-              {x.label}
+          {(["daily", "weekly"] as const).map((f) => (
+            <button key={f} type="button" className="choice" aria-pressed={freq === f} onClick={() => setFreq(f)}>
+              {t.plan[f]}
             </button>
           ))}
         </div>
       </div>
 
       <div className="field">
-        <label className="row" style={{ gap: 8 }}>
-          <input type="checkbox" checked={dip} onChange={(e) => setDip(e.target.checked)} style={{ minHeight: 0 }} />
-          اشتري أكتر لما ينزل
+        <label className="check">
+          <input type="checkbox" checked={dip} onChange={(e) => setDip(e.target.checked)} />
+          <span>
+            <b>{t.plan.dip}</b>
+            <span className="small muted" style={{ display: "block" }}>{t.plan.dipD}</span>
+          </span>
         </label>
-        <span className="small muted">
-          لو السعر أقل من أعلى سعر في 30 يوم بـ 10% أو أكتر، المبلغ يبقى ×1.5، في حدود السقف اللي على السلسلة.
-        </span>
       </div>
 
-      <div className="note">
-        <strong>مراجعة:</strong> هتشتري {label} بـ <span className="num">${amount}</span> {f.label === "يومي" ? "كل يوم" : "كل أسبوع"}{" "}
-        (حوالي <span className="num">${monthly}</span> في الشهر). هتصرف بحد أقصى{" "}
-        <span className="num">${dailyCap}</span> في اليوم لمدة 30 يوم. توقفه في أي وقت.
+      <div className="summary">
+        <b>{t.plan.review}</b>
+        <p className="mt8">{t.plan.reviewTxt(what, amount, freq === "daily" ? t.plan.everyDay : t.plan.everyWeek, amount * PER_MONTH[freq], dailyCap)}</p>
       </div>
 
-      <SignPermission plan={{ target, amountUsd: amount, frequency: freq, dipBoost: dip, dailyCapUsd: dailyCap }} />
+      {CHAIN.testnet && <p className="note mt16">{t.plan.testnetNote}</p>}
+
+      <label className="check mt24">
+        <input type="checkbox" checked={eligible} onChange={(e) => setEligible(e.target.checked)} />
+        <span className="small">{t.plan.eligible}</span>
+      </label>
+
+      <SignPermission plan={{ target, amountUsd: amount, frequency: freq, dipBoost: dip, dailyCapUsd: dailyCap }} disabled={!eligible} />
     </div>
   );
 }

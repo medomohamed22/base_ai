@@ -1,53 +1,55 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Reveal from "@/components/Reveal";
 import WalletFunding from "@/components/WalletFunding";
+import { CHAIN } from "@/lib/chain";
+import { getDict } from "@/lib/lang.server";
 
-export const metadata: Metadata = { title: "إزاي أبدأ | سهم" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getDict();
+  return { title: t.nav.start };
+}
 
-const SOURCES = [
-  {
-    name: "Binance",
-    steps: ["من المحفظة اختار USDC ثم سحب (Withdraw).", "الصق عنوان محفظتك في سهم.", "الشبكة: Base.", "أكّد السحب."],
-  },
-  {
-    name: "Coinbase",
-    steps: ["اختار USDC ثم إرسال (Send).", "الصق عنوان محفظتك في سهم.", "الشبكة: Base (غالبًا من غير رسوم).", "أكّد الإرسال."],
-  },
-  {
-    name: "محفظة تانية",
-    steps: ["افتح محفظتك (MetaMask أو غيرها).", "حوّل لشبكة Base.", "ابعت USDC لعنوان محفظتك في سهم."],
-  },
-];
-
-export default function Start() {
+export default async function Start() {
+  const { t } = await getDict();
+  const sources: [string, string[]][] = [
+    ["Binance", t.start.steps.binance],
+    ["Coinbase", t.start.steps.coinbase],
+    [t.start.other, t.start.steps.other],
+  ];
   return (
-    <>
-      <h1>إزاي أحط USDC في محفظتي؟</h1>
-      <p className="muted">سهم بيشتري بـ USDC (دولار رقمي) على شبكة Base. لو عندك USDC في منصة، حوّله لمحفظتك في 3 خطوات.</p>
-      <p className="note">
-        ⚠️ اختار شبكة <strong>Base</strong> بس. لو اخترت شبكة تانية الفلوس ممكن تضيع.
-      </p>
+    <div className="wrap page">
+      <div className="hero-in" style={{ maxWidth: 720 }}>
+        <h1 className="h1">{t.start.title}</h1>
+        <p className="lead mt16">{t.start.sub}</p>
+        <p className="note mt24">⚠️ {t.start.warn}</p>
+        {CHAIN.testnet && <p className="note mt8">{t.start.testnetFaucet}</p>}
+      </div>
 
-      <div className="grid section">
-        {SOURCES.map((s) => (
-          <div className="card" key={s.name}>
-            <h3>{s.name}</h3>
-            <ol className="muted small">
-              {s.steps.map((x) => (
-                <li key={x}>{x}</li>
+      <div className="grid-3 mt40">
+        {sources.map(([name, steps], i) => (
+          <Reveal key={name} className="card" delay={i * 80}>
+            <h3>{name}</h3>
+            <ol className="muted small mt16" style={{ paddingInlineStart: 18, margin: "16px 0 0", lineHeight: 1.9 }}>
+              {steps.map((s) => (
+                <li key={s}>{s}</li>
               ))}
             </ol>
-          </div>
+          </Reveal>
         ))}
       </div>
 
-      <div className="section card">
-        <h2>عنوان محفظتك</h2>
-        <WalletFunding />
-        <p style={{ marginTop: 16 }}>
-          <Link href="/plan">كمّل للخطة ←</Link>
+      <Reveal className="card mt24" delay={100}>
+        <h2 className="h2" style={{ fontSize: 26 }}>{t.start.yourAddr}</h2>
+        <div className="mt16">
+          <WalletFunding />
+        </div>
+        <p className="mt24">
+          <Link href="/plan" className="link">
+            {t.start.next} <span className="arrow">→</span>
+          </Link>
         </p>
-      </div>
-    </>
+      </Reveal>
+    </div>
   );
 }

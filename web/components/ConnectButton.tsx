@@ -2,34 +2,36 @@
 
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { shortAddr } from "@/lib/chain";
+import { useT } from "./LangProvider";
 
 export default function ConnectButton({ big = false }: { big?: boolean }) {
+  const { t } = useT();
   const { address, isConnected } = useAccount();
   const { connect, connectors, isPending, error } = useConnect();
   const { disconnect } = useDisconnect();
+  const base = connectors.find((c) => c.type !== "injected") ?? connectors[0];
 
   if (isConnected) {
+    if (big) return null;
     return (
-      <span className="row" style={{ gap: 8 }}>
-        <span className="num small">{shortAddr(address)}</span>
-        <button className="choice" type="button" onClick={() => disconnect()}>
-          خروج
-        </button>
-      </span>
+      <button className="pill" type="button" onClick={() => disconnect()} title={t.wallet.out}>
+        <span className="dot" aria-hidden />
+        <span className="num">{shortAddr(address)}</span>
+      </button>
     );
   }
 
   return (
     <span>
       <button
-        className={big ? "btn" : "choice"}
+        className={big ? "btn btn-lg" : "pill pill-solid"}
         type="button"
         disabled={isPending}
-        onClick={() => connect({ connector: connectors[0] })}
+        onClick={() => connect({ connector: base })}
       >
-        {isPending ? "بنفتح المحفظة…" : "ادخل بمحفظة Base"}
+        {isPending ? t.wallet.connecting : big ? t.wallet.connectBig : t.wallet.connect}
       </button>
-      {error && big && <p className="small muted">ما قدرناش نفتح المحفظة. جرّب تاني.</p>}
+      {error && big && <p className="small muted mt8">{t.wallet.failed}</p>}
     </span>
   );
 }

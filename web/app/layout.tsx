@@ -1,67 +1,70 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans_Arabic } from "next/font/google";
+import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import Link from "next/link";
-import ConnectButton from "@/components/ConnectButton";
+import Header from "@/components/Header";
+import { LangProvider } from "@/components/LangProvider";
+import { CHAIN } from "@/lib/chain";
+import { dirOf } from "@/lib/i18n";
+import { getDict } from "@/lib/lang.server";
 import Providers from "./providers";
 import "./globals.css";
 
 const plex = IBM_Plex_Sans_Arabic({
   subsets: ["arabic", "latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
+  variable: "--f-ar",
 });
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--f-en" });
 
-export const metadata: Metadata = {
-  title: "سهم | Sahm",
-  description: "استثمر في أسهم أمريكية حلال، بالعربي، من دولار واحد. فلوسك في محفظتك. Arabic-first agent for tokenized US stocks on Base.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { lang } = await getDict();
+  return lang === "ar"
+    ? {
+        title: { default: "سهم | استثمر في أسهم أمريكية حلال", template: "%s | سهم" },
+        description: "استثمر في أسهم أمريكية حلال، بالعربي، من دولار واحد. فلوسك في محفظتك.",
+      }
+    : {
+        title: { default: "Sahm | Halal US stocks from $1", template: "%s | Sahm" },
+        description: "Invest in halal US stocks from one dollar, in Arabic or English. Your money stays in your wallet.",
+      };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F3F6F5" },
-    { media: "(prefers-color-scheme: dark)", color: "#0D1513" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
   ],
 };
 
-const NAV = [
-  { href: "/stocks", label: "الأسهم" },
-  { href: "/plan", label: "خطتي" },
-  { href: "/portfolio", label: "محفظتي" },
-  { href: "/start", label: "إزاي أبدأ" },
-];
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { lang, t } = await getDict();
   return (
-    <html lang="ar" dir="rtl">
-      <body className={plex.className}>
+    <html lang={lang} dir={dirOf(lang)} className={`${plex.variable} ${inter.variable}`}>
+      <body>
         <Providers>
-        <header className="top">
-          <div className="wrap top-in">
-            <Link href="/" className="brand">
-              سهم <span className="brand-en">Sahm</span>
-            </Link>
-            <nav className="nav">
-              {NAV.map((n) => (
-                <Link key={n.href} href={n.href}>
-                  {n.label}
-                </Link>
-              ))}
-              <ConnectButton />
-            </nav>
-          </div>
-        </header>
-        <main className="wrap">{children}</main>
-        <footer className="foot wrap">
-          <p>
-            مش نصيحة مالية. الأسهم المرمّزة متاحة بس خارج أمريكا للمؤهلين. فحص الحلال استرشادي، مش فتوى.
-          </p>
-          <p dir="ltr">
-            Not financial advice. Tokenized stocks are available only to eligible users outside the US. Halal screen
-            is indicative, not a fatwa. · <Link href="/stats">/stats</Link>
-          </p>
-        </footer>
+          <LangProvider lang={lang}>
+            {CHAIN.testnet && <div className="banner">{t.testnet}</div>}
+            <Header />
+            <main>{children}</main>
+            <footer className="foot">
+              <div className="wrap">
+                <nav>
+                  <Link href="/stocks">{t.nav.stocks}</Link>
+                  <Link href="/plan">{t.nav.plan}</Link>
+                  <Link href="/portfolio">{t.nav.portfolio}</Link>
+                  <Link href="/ask">{t.nav.ask}</Link>
+                  <Link href="/start">{t.nav.start}</Link>
+                  <Link href="/stats">{t.nav.stats}</Link>
+                </nav>
+                <p>{t.footer.l1}</p>
+                <p>{t.footer.l2}</p>
+                <p className="ltr">© 2026 Sahm · Built on Base</p>
+              </div>
+            </footer>
+          </LangProvider>
         </Providers>
       </body>
     </html>

@@ -2,15 +2,17 @@
 
 import { requestSpendPermission } from "@base-org/account/spend-permission/browser";
 import type { ProviderInterface } from "@base-org/account";
+import Link from "next/link";
 import { useState } from "react";
 import { parseUnits } from "viem";
 import { useAccount, useSwitchChain } from "wagmi";
 import ConnectButton from "./ConnectButton";
 import { useUsdcBalance } from "./hooks";
+import { useT } from "./LangProvider";
 import { CHAIN, EXECUTOR, USDC } from "@/lib/chain";
 
 export type PlanDraft = {
-  target: string; // ticker or "HALAL"
+  target: string;
   amountUsd: number;
   frequency: "daily" | "weekly";
   dipBoost: boolean;
@@ -19,7 +21,8 @@ export type PlanDraft = {
 
 const PLAN_DAYS = 30;
 
-export default function SignPermission({ plan }: { plan: PlanDraft }) {
+export default function SignPermission({ plan, disabled }: { plan: PlanDraft; disabled?: boolean }) {
+  const { t, lang } = useT();
   const { address, isConnected, connector, chainId } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const { usd } = useUsdcBalance();
@@ -28,21 +31,16 @@ export default function SignPermission({ plan }: { plan: PlanDraft }) {
 
   if (!isConnected || !address) {
     return (
-      <div style={{ marginTop: 16 }}>
+      <div className="mt24">
         <ConnectButton big />
       </div>
     );
   }
-
   if (!EXECUTOR) {
     return (
       <>
-        <button className="btn" style={{ marginTop: 16, width: "100%" }} disabled>
-          وقّع إذن الصرف (قريبًا)
-        </button>
-        <p className="small muted" style={{ marginTop: 8 }}>
-          التوقيع هيتفعّل أول ما عقد سهم يتنشر على {CHAIN.name}.
-        </p>
+        <button className="btn btn-lg btn-block mt24" disabled>{t.plan.sign}</button>
+        <p className="small muted mt8">{t.plan.soon}</p>
       </>
     );
   }
@@ -63,46 +61,44 @@ export default function SignPermission({ plan }: { plan: PlanDraft }) {
         periodInDays: 1,
         end: new Date(Date.now() + PLAN_DAYS * 86_400_000),
       });
-      // Saved locally until the plans API (Supabase sahm_plans) is wired up.
-      try {
-        const all = JSON.parse(localStorage.getItem("sahm.plans") || "[]");
-        all.push({ plan, permission, createdAt: Date.now() });
-        localStorage.setItem("sahm.plans", JSON.stringify(all));
-      } catch {
-        /* storage blocked */
+      const r = await fetch("/api/plans", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ plan, permission, lang }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.ok) {
+        setState("error");
+        setMsg(t.plan.saveErr + (j.error ? ` (${j.error})` : ""));
+        return;
       }
       setState("done");
     } catch (e) {
       setState("error");
-      setMsg(e instanceof Error ? e.message : String(e));
+      const m = e instanceof Error ? e.message : String(e);
+      setMsg(`${t.plan.err} ${m.length < 120 ? m : ""}`);
     }
   };
 
   return (
     <>
-      {usd !== undefined && usd < plan.amountUsd && (
-        <p className="note small" style={{ marginTop: 16 }}>
-          رصيدك {usd.toFixed(2)} USDC، أقل من أول شراء. <a href="/start">حط USDC الأول</a>.
+      {usd !== undefined && usd < plan.amountUsd && state !== "done" && (
+        <p className="note mt24">
+          {t.plan.lowBal(usd.toFixed(2))} <Link href="/start" className="link">{t.plan.fund}</Link>
         </p>
       )}
-      <button
-        className="btn"
-        style={{ marginTop: 16, width: "100%" }}
-        disabled={state === "signing" || state === "done"}
-        onClick={sign}
-      >
-        {state === "signing" ? "وقّع في المحفظة…" : state === "done" ? "اتوقّع ✅" : "وقّع إذن الصرف"}
+      <button className="btn btn-lg btn-block mt24" disabled={disabled || state === "signing" || state === "done"} onClick={sign}>
+        {state === "signing" ? t.plan.signing : state === "done" ? t.plan.signed : t.plan.sign}
       </button>
       {state === "done" && (
-        <p className="small muted" style={{ marginTop: 8 }}>
-          تمام! الإذن اتوقّع بسقف ${plan.dailyCapUsd} في اليوم لمدة {PLAN_DAYS} يوم. تقدر تلغيه من محفظتي في أي وقت.
+        <p className="small mt16">
+          {t.plan.done(plan.dailyCapUsd)}{" "}
+          <Link href="/portfolio" className="link">
+            {t.nav.portfolio} <span className="arrow">→</span>
+          </Link>
         </p>
       )}
-      {state === "error" && (
-        <p className="small" style={{ marginTop: 8, color: "var(--no)" }}>
-          التوقيع ما كملش. {msg.length < 120 ? msg : ""}
-        </p>
-      )}
+      {state === "error" && <p className="err mt8 break">{msg}</p>}
     </>
   );
 }
