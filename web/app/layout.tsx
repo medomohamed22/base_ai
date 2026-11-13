@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import Link from "next/link";
+import ConnectButton from "@/components/ConnectButton";
+import Providers from "./providers";
 import "./globals.css";
 
 const plex = IBM_Plex_Sans_Arabic({
@@ -34,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ar" dir="rtl">
       <body className={plex.className}>
+        <Providers>
         <header className="top">
           <div className="wrap top-in">
             <Link href="/" className="brand">
@@ -45,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   {n.label}
                 </Link>
               ))}
+              <ConnectButton />
             </nav>
           </div>
         </header>
@@ -58,6 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             is indicative, not a fatwa. · <Link href="/stats">/stats</Link>
           </p>
         </footer>
+        </Providers>
       </body>
     </html>
   );

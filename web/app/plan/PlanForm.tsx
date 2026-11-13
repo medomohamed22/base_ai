@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { HALAL_BASKET, STOCKS } from "@/lib/stocks";
+import SignPermission from "@/components/SignPermission";
 
 const AMOUNTS = [1, 5, 10, 20];
 const FREQ = [
@@ -79,12 +80,7 @@ export default function PlanForm() {
         <span className="num">${dailyCap}</span> في اليوم لمدة 30 يوم. توقفه في أي وقت.
       </div>
 
-      <button className="btn" style={{ marginTop: 16, width: "100%" }} disabled>
-        وقّع إذن الصرف (قريبًا)
-      </button>
-      <p className="small muted" style={{ marginTop: 8 }}>
-        التوقيع بمحفظة Base هيتفعّل بعد نشر العقد على Base Sepolia.
-      </p>
+      <SignPermission plan={{ target, amountUsd: amount, frequency: freq, dipBoost: dip, dailyCapUsd: dailyCap }} />
     </div>
   );
 }

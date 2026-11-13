@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import WalletFunding from "@/components/WalletFunding";
 
 export const metadata: Metadata = { title: "إزاي أبدأ | سهم" };
 
@@ -42,8 +43,10 @@ export default function Start() {
 
       <div className="section card">
         <h2>عنوان محفظتك</h2>
-        <p className="muted">هيظهر هنا بعد ما تدخل بمحفظة Base، ومعاه زر نسخ وQR، وهنقولك &quot;وصلت ✅&quot; أول ما الفلوس توصل.</p>
-        <Link href="/plan" className="btn">كمّل للخطة</Link>
+        <WalletFunding />
+        <p style={{ marginTop: 16 }}>
+          <Link href="/plan">كمّل للخطة ←</Link>
+        </p>
       </div>
     </>
   );
