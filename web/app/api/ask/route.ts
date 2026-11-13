@@ -6,10 +6,13 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 /**
- * "Ask Sahm": research + education assistant on Meta's Llama API (OpenAI-compatible chat completions).
- * It explains; it never places or recommends trades. Env: LLAMA_API_KEY, LLAMA_MODEL, optional LLAMA_BASE_URL.
+ * "Ask Sahm": research + education assistant on Meta Model API (api.meta.ai/v1, OpenAI-compatible chat completions).
+ * It explains; it never places or recommends trades.
+ * Env: MODEL_API_KEY (required); optional META_MODEL (default muse-spark-1.3-contributor), META_BASE_URL.
  */
-const BASE = (process.env.LLAMA_BASE_URL || "https://api.llama.com/compat/v1").replace(/\/$/, "");
+const BASE = (process.env.META_BASE_URL || "https://api.meta.ai/v1").replace(/\/$/, "");
+const MODEL = process.env.META_MODEL || "muse-spark-1.3-contributor";
+const apiKey = () => process.env.MODEL_API_KEY || process.env.META_API_KEY || "";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -24,9 +27,9 @@ function limited(ip: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const key = process.env.LLAMA_API_KEY;
-  const model = process.env.LLAMA_MODEL;
-  if (!key || !model) return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });
+  const key = apiKey();
+  const model = MODEL;
+  if (!key) return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });
 
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anon";
   if (limited(ip)) return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
@@ -75,13 +78,12 @@ export async function POST(req: NextRequest) {
     });
     if (!r.ok) {
       const detail = (await r.text()).slice(0, 200);
-      console.error("llama error", r.status, detail);
+      console.error("meta model api error", r.status, detail);
       return NextResponse.json({ ok: false, error: `upstream_${r.status}` }, { status: 502 });
     }
     const j = await r.json();
     const answer: string =
       j?.choices?.[0]?.message?.content ??
-      j?.completion_message?.content?.text ?? // native Llama API shape
       "";
     if (!answer) return NextResponse.json({ ok: false, error: "empty" }, { status: 502 });
     return NextResponse.json({ ok: true, answer });
@@ -91,5 +93,5 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json({ enabled: !!(process.env.LLAMA_API_KEY && process.env.LLAMA_MODEL) });
+  return NextResponse.json({ enabled: !!apiKey(), model: MODEL });
 }

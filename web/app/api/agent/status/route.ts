@@ -26,7 +26,7 @@ export async function GET() {
     agentMatches: !!server && !!onchain && server.toLowerCase() === onchain.toLowerCase(),
     agentGasEth: gas,
     db: dbEnabled(),
-    ai: !!(process.env.LLAMA_API_KEY && process.env.LLAMA_MODEL),
+    ai: !!(process.env.MODEL_API_KEY || process.env.META_API_KEY),
     cronSecret: !!process.env.CRON_SECRET,
   });
 }
