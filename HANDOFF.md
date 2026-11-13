@@ -115,6 +115,19 @@ survey/              صفحة الاستبيان
 
 ---
 
+## 2.5 اللي اتعمل يوم 13 نوفمبر
+- **الريبو:** حساب GitHub اتغيّر لـ `mohamedgamal2248`. الشغل على branch `claude/setup-vercel-deployment-4phjm2`.
+- **Vercel:** مشروع `sahm` مربوط بالريبو الجديد، وFramework = Next.js. الـ previews بتتبني تلقائي مع كل push.
+- **`contracts/`:** `SahmExecutor` + 13 fork test على mainnet (NVDAc حقيقي) + اختبار Sepolia. كلهم ✅.
+- **Sepolia (اتنشر من محفظة صاحب المشروع عن طريق `/deploy`):** العناوين في `contracts/deployments/base-sepolia.json`.
+  - SahmExecutor `0xd2839a6ae65636B964CB54D4D3a6A2A55954D2dE`، والسهم الوهمي tNVDA بسعر $180.
+  - محفظة صاحب المشروع Coinbase Wallet بنظام EIP-7702، فالنشر لازم يعدّي على CREATE2 factory.
+  - الـ owner والـ agent نفس العنوان على Sepolia بس. على mainnet لازم يبقوا منفصلين.
+- **`web/`:** Next.js 16 RTL. فيه: الرئيسية، والأسهم بفلتر الحلال، والدليل، والخطة، والمحفظة، والأرقام، و`/deploy`.
+  - ربط محفظة Base (passkey)، وتوقيع Spend Permission، وزر "إيقاف كل حاجة".
+  - على Vercel (preview): `NEXT_PUBLIC_EXECUTOR_ADDRESS` و`NEXT_PUBLIC_CHAIN=base-sepolia`.
+- **ملحوظة:** Coinbase Wallet بيحذّر من لينكات vercel.app الطويلة. الحل: دومين خاص.
+
 ## 3. الخطة: إيه اللي جاي
 
 ### يوم 13 نوفمبر: بداية البناء
